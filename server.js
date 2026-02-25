@@ -50,10 +50,19 @@ async function fetchCourses() {
 
 function buildRss(courses) {
   const now = new Date().toUTCString();
+  const nowMs = Date.now();
 
-  const items = courses.map(course => {
+  // Sort soonest first, then assign descending fake pubDates so MailerLite
+  // (which sorts descending) displays them in soonest-first order.
+  const sorted = [...courses].sort((a, b) => {
+    const aDate = a.events?.[0]?.starts_at ? new Date(a.events[0].starts_at) : new Date(0);
+    const bDate = b.events?.[0]?.starts_at ? new Date(b.events[0].starts_at) : new Date(0);
+    return aDate - bDate;
+  });
+
+  const items = sorted.map((course, index) => {
     const event = course.events && course.events[0];
-    const pubDate = event ? formatDate(event.starts_at) : now;
+    const pubDate = new Date(nowMs - index * 60000).toUTCString();
     const bookUrl = event ? event.book_url : course.url;
     const tags = (course.tags || []).map(t => t.name).join(', ');
     const description = stripHtml(course.description || '');
