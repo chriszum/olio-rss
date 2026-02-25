@@ -51,7 +51,7 @@ async function fetchCourses() {
 function buildRss(courses) {
   const now = new Date().toUTCString();
 
-  const items = [...courses].reverse().map(course => {
+  const items = courses.map(course => {
     const event = course.events && course.events[0];
     const pubDate = event ? formatDate(event.starts_at) : now;
     const bookUrl = event ? event.book_url : course.url;
@@ -68,8 +68,6 @@ function buildRss(courses) {
     })() : '';
 
     const fullDescription = [
-      eventDate ? `📅 ${eventDate}` : '',
-      '',
       shortDesc,
       '',
       tags ? `Tags: ${tags}` : '',
@@ -80,6 +78,7 @@ function buildRss(courses) {
       <link>${escapeXml(bookUrl || course.url)}</link>
       <guid isPermaLink="true">${escapeXml(course.url)}</guid>
       <pubDate>${pubDate}</pubDate>
+      <author>${escapeXml(eventDate)}</author>
       <description>${escapeXml(fullDescription)}</description>
       ${course.featured_image ? `<enclosure url="${escapeXml(course.featured_image)}" type="image/jpeg" length="0"/>` : ''}
       ${course.featured_image ? `<media:content url="${escapeXml(course.featured_image)}" medium="image"/>` : ''}
