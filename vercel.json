@@ -13,6 +13,6 @@
     }
   ],
   "env": {
-    "FEED_URL": "https://your-app.vercel.app/rss"
+    "FEED_URL": "https://olio-rss.vercel.app/rss"
   }
 }
