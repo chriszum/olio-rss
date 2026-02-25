@@ -116,7 +116,7 @@ ${items.join('\n')}
 </rss>`;
 }
 
-app.get(['/rss', '/weekly'], async (req, res) => {
+app.get(['/rss', '/weekly', '/v2'], async (req, res) => {
   try {
     const courses = await fetchCourses();
     const xml = buildRss(courses);
