@@ -51,25 +51,24 @@ async function fetchCourses() {
 function buildRss(courses) {
   const now = new Date().toUTCString();
 
-  const items = courses.map(course => {
+  const items = [...courses].reverse().map(course => {
     const event = course.events && course.events[0];
     const pubDate = event ? formatDate(event.starts_at) : now;
     const bookUrl = event ? event.book_url : course.url;
-    const price = formatPrice(course.tickets);
     const tags = (course.tags || []).map(t => t.name).join(', ');
     const description = stripHtml(course.description || '');
     const shortDesc = description.length > 500 ? description.slice(0, 497) + '...' : description;
 
-    const eventDate = event
-      ? new Date(event.starts_at).toLocaleDateString('en-US', {
-          weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
-          hour: '2-digit', minute: '2-digit', timeZone: course.timezone || 'America/New_York'
-        })
-      : '';
+    const tz = course.timezone || 'America/New_York';
+    const eventDate = event ? (() => {
+      const d = new Date(event.starts_at);
+      const datePart = d.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', timeZone: tz });
+      const timePart = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
+      return `${datePart} · ${timePart}`;
+    })() : '';
 
     const fullDescription = [
       eventDate ? `📅 ${eventDate}` : '',
-      price ? `🎟️ ${price}` : '',
       '',
       shortDesc,
       '',
